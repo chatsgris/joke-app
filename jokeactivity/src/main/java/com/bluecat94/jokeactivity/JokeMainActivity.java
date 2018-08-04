@@ -1,6 +1,5 @@
 package com.bluecat94.jokeactivity;
 
-import android.app.FragmentManager;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
