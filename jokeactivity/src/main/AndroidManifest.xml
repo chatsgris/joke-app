@@ -3,7 +3,7 @@
     package="com.bluecat94.jokeactivity">
 
     <application>
-        <activity android:name=".JokeMainActivity"></activity>
+        <activity android:name=".JokeMainActivity" />
     </application>
 
 </manifest>
