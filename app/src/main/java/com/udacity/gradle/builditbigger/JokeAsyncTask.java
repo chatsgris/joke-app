@@ -3,7 +3,8 @@ package com.udacity.gradle.builditbigger;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.widget.Toast;
+import android.support.annotation.Nullable;
+import android.support.test.espresso.IdlingResource;
 
 import com.bluecat94.jokeactivity.JokeMainActivity;
 import com.google.api.client.extensions.android.http.AndroidHttp;
@@ -20,13 +21,22 @@ import java.io.IOException;
  * Created by mimiliu on 8/4/18.
  */
 
-public class JokeAsyncTask extends AsyncTask<Context, Void, String> {
+public class JokeAsyncTask extends AsyncTask<Void, Void, String> {
     private static MyApi myApiService = null;
-    private Context context;
-    private String JOKE_EXTRA_KEY = "JOKE_EXTRA_KEY";
+    private Context mContext;
+    private SimpleIdlingResource mIdlingResource;
+
+    JokeAsyncTask(Context context, @Nullable final SimpleIdlingResource idlingResource) {
+        this.mContext = context;
+        this.mIdlingResource = idlingResource;
+    }
 
     @Override
-    protected String doInBackground(Context... contexts) {
+    protected String doInBackground(Void... contexts) {
+        if (mIdlingResource != null) {
+            mIdlingResource.setIdleState(false);
+        }
+
         if(myApiService == null) {  // Only do this once
             MyApi.Builder builder = new MyApi.Builder(AndroidHttp.newCompatibleTransport(),
                     new AndroidJsonFactory(), null)
@@ -45,10 +55,12 @@ public class JokeAsyncTask extends AsyncTask<Context, Void, String> {
             myApiService = builder.build();
         }
 
-        context = contexts[0];
-
         try {
-            return myApiService.sayJoke().execute().getData();
+            String data = myApiService.sayJoke().execute().getData();
+            if (mIdlingResource != null) {
+                mIdlingResource.setIdleState(true);
+            }
+            return data;
         } catch (IOException e) {
             return e.getMessage();
         }
@@ -56,8 +68,9 @@ public class JokeAsyncTask extends AsyncTask<Context, Void, String> {
 
     @Override
     protected void onPostExecute(String joke) {
-        Intent intent = new Intent(context, JokeMainActivity.class);
+        Intent intent = new Intent(mContext, JokeMainActivity.class);
+        String JOKE_EXTRA_KEY = "JOKE_EXTRA_KEY";
         intent.putExtra(JOKE_EXTRA_KEY, joke);
-        context.startActivity(intent);
+        mContext.startActivity(intent);
     }
 }
