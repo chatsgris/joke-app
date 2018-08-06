@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
-import android.support.test.espresso.IdlingResource;
 
 import com.bluecat94.jokeactivity.JokeMainActivity;
 import com.google.api.client.extensions.android.http.AndroidHttp;
