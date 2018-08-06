@@ -8,25 +8,38 @@ import android.view.MenuItem;
 public class JokeMainActivity extends AppCompatActivity {
 
     String JOKE_EXTRA_KEY = "JOKE_EXTRA_KEY";
+    String joke;
+    JokeFragment jokeFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_joke_main);
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        Intent intent = getIntent();
-        String joke = intent.getExtras().getString(JOKE_EXTRA_KEY);
-
-        Bundle bundle = new Bundle();
-        bundle.putString(JOKE_EXTRA_KEY, joke);
-        JokeFragment jokeFragment = new JokeFragment();
-        jokeFragment.setArguments(bundle);
-
         android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .add(R.id.joke_activity_container, jokeFragment).commit();
+
+        if (savedInstanceState != null) {
+            jokeFragment = (JokeFragment) fragmentManager.getFragment(savedInstanceState, "JOKE_FRAGMENT");
+            fragmentManager.beginTransaction()
+                    .replace(R.id.joke_activity_container, jokeFragment).commit();
+        } else {
+            Intent intent = getIntent();
+            joke = intent.getExtras().getString(JOKE_EXTRA_KEY);
+            Bundle bundle = new Bundle();
+            bundle.putString(JOKE_EXTRA_KEY, joke);
+            jokeFragment = new JokeFragment();
+            jokeFragment.setArguments(bundle);
+
+            fragmentManager.beginTransaction()
+                    .add(R.id.joke_activity_container, jokeFragment).commit();
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(JOKE_EXTRA_KEY, joke);
+        getSupportFragmentManager().putFragment(outState, "JOKE_FRAGMENT", jokeFragment);
     }
 
     @Override
